@@ -16,7 +16,7 @@ declare module '@inertiajs/core' {
 
 declare global {
     interface Window {
-        Echo: any;
-        Pusher: any;
+        Echo?: any;
+        Pusher?: any;
     }
 }
