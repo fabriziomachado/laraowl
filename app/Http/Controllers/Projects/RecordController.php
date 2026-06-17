@@ -64,7 +64,10 @@ class RecordController extends Controller
 
     protected function renderRequestsIndex(Project $project, string $period, ?string $from, ?string $to): Response
     {
-        return $this->renderWithStats('projects/requests', $this->recordService->getRequestStats($project, $period, $from, $to), $project, $period, $from, $to);
+        $sort = request()->query('sort', 'total');
+        $direction = request()->query('direction', 'desc');
+
+        return $this->renderWithStats('projects/requests', $this->recordService->getRequestStats($project, $period, $from, $to, $sort, $direction), $project, $period, $from, $to);
     }
 
     protected function renderUsersIndex(Project $project, string $period, ?string $from, ?string $to): Response

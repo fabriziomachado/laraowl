@@ -1,5 +1,5 @@
 import { Head, Link, usePage, router } from '@inertiajs/react';
-import { Activity, AlertCircle, ArrowUpRight, Globe } from 'lucide-react';
+import { Activity, AlertCircle, ArrowUpRight, ChevronDown, ChevronUp, ChevronsUpDown, Globe } from 'lucide-react';
 import { useEffect } from 'react';
 import {
     BarChart,
@@ -29,11 +29,15 @@ export default function RequestsIndex({
     timeSeries,
     stats,
     overview,
+    sort: currentSort = 'total',
+    direction: currentDirection = 'desc',
 }: {
     requests: any;
     timeSeries: any;
     stats: any;
     overview: any;
+    sort?: string;
+    direction?: string;
 }) {
     const { props }: any = usePage();
     const teamSlug = props.current_team?.slug || props.currentTeam?.slug;
@@ -58,6 +62,25 @@ export default function RequestsIndex({
     }, []);
 
     const data = requests.data || [];
+
+    const handleSort = (column: string) => {
+        const newDirection =
+            currentSort === column && currentDirection === 'desc' ? 'asc' : 'desc';
+        router.get(
+            window.location.pathname,
+            { ...Object.fromEntries(new URLSearchParams(window.location.search)), sort: column, direction: newDirection },
+            { preserveScroll: true, preserveState: true },
+        );
+    };
+
+    const SortIcon = ({ column }: { column: string }) => {
+        if (currentSort !== column) {
+            return <ChevronsUpDown className="ml-1 inline h-3 w-3 opacity-40" />;
+        }
+        return currentDirection === 'asc'
+            ? <ChevronUp className="ml-1 inline h-3 w-3" />
+            : <ChevronDown className="ml-1 inline h-3 w-3" />;
+    };
 
     const getMethodColor = (method: string) => {
         switch (method?.toUpperCase()) {
@@ -341,29 +364,53 @@ export default function RequestsIndex({
                                 <Table>
                                     <TableHeader className="bg-muted/30">
                                         <TableRow className="border-border hover:bg-transparent">
-                                            <TableHead className="text-[10px] font-bold text-muted-foreground uppercase">
-                                                Method
+                                            <TableHead
+                                                className="cursor-pointer select-none text-[10px] font-bold text-muted-foreground uppercase hover:text-foreground"
+                                                onClick={() => handleSort('method')}
+                                            >
+                                                Method<SortIcon column="method" />
                                             </TableHead>
-                                            <TableHead className="text-[10px] font-bold text-muted-foreground uppercase">
-                                                Path
+                                            <TableHead
+                                                className="cursor-pointer select-none text-[10px] font-bold text-muted-foreground uppercase hover:text-foreground"
+                                                onClick={() => handleSort('path')}
+                                            >
+                                                Path<SortIcon column="path" />
                                             </TableHead>
-                                            <TableHead className="text-center text-[10px] font-bold text-muted-foreground uppercase">
-                                                1/2/3xx
+                                            <TableHead
+                                                className="cursor-pointer select-none text-center text-[10px] font-bold text-muted-foreground uppercase hover:text-foreground"
+                                                onClick={() => handleSort('ok_count')}
+                                            >
+                                                1/2/3xx<SortIcon column="ok_count" />
                                             </TableHead>
-                                            <TableHead className="text-center text-[10px] font-bold text-muted-foreground uppercase">
-                                                4xx
+                                            <TableHead
+                                                className="cursor-pointer select-none text-center text-[10px] font-bold text-muted-foreground uppercase hover:text-foreground"
+                                                onClick={() => handleSort('client_error_count')}
+                                            >
+                                                4xx<SortIcon column="client_error_count" />
                                             </TableHead>
-                                            <TableHead className="text-center text-[10px] font-bold text-muted-foreground uppercase">
-                                                5xx
+                                            <TableHead
+                                                className="cursor-pointer select-none text-center text-[10px] font-bold text-muted-foreground uppercase hover:text-foreground"
+                                                onClick={() => handleSort('server_error_count')}
+                                            >
+                                                5xx<SortIcon column="server_error_count" />
                                             </TableHead>
-                                            <TableHead className="text-right text-[10px] font-bold text-muted-foreground uppercase">
-                                                Total
+                                            <TableHead
+                                                className="cursor-pointer select-none text-right text-[10px] font-bold text-muted-foreground uppercase hover:text-foreground"
+                                                onClick={() => handleSort('total')}
+                                            >
+                                                Total<SortIcon column="total" />
                                             </TableHead>
-                                            <TableHead className="text-right text-[10px] font-bold text-muted-foreground uppercase">
-                                                Avg
+                                            <TableHead
+                                                className="cursor-pointer select-none text-right text-[10px] font-bold text-muted-foreground uppercase hover:text-foreground"
+                                                onClick={() => handleSort('avg_duration')}
+                                            >
+                                                Avg<SortIcon column="avg_duration" />
                                             </TableHead>
-                                            <TableHead className="text-right text-[10px] font-bold text-muted-foreground uppercase">
-                                                P95
+                                            <TableHead
+                                                className="cursor-pointer select-none text-right text-[10px] font-bold text-muted-foreground uppercase hover:text-foreground"
+                                                onClick={() => handleSort('p95_duration')}
+                                            >
+                                                P95<SortIcon column="p95_duration" />
                                             </TableHead>
                                             <TableHead className="w-[50px]"></TableHead>
                                         </TableRow>
