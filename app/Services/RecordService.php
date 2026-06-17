@@ -38,8 +38,12 @@ class RecordService
     /**
      * Aggregate Request Data
      */
-    public function getRequestStats(Project $project, ?string $period = null, ?string $from = null, ?string $to = null): array
+    public function getRequestStats(Project $project, ?string $period = null, ?string $from = null, ?string $to = null, string $sort = 'total', string $direction = 'desc'): array
     {
+        $allowedSorts = ['method', 'path', 'total', 'ok_count', 'client_error_count', 'server_error_count', 'avg_duration', 'p95_duration'];
+        $sort = in_array($sort, $allowedSorts) ? $sort : 'total';
+        $direction = $direction === 'asc' ? 'asc' : 'desc';
+
         $overview = $project->records()
             ->ofType('request')
             ->forPeriod($period, $from, $to)
@@ -69,7 +73,7 @@ class RecordService
                     DB::raw("MAX(JSON_EXTRACT(payload, '$.duration')) as p95_duration"),
                 ])
                 ->groupBy('method', 'path', 'fingerprint')
-                ->orderBy('total', 'desc')
+                ->orderBy($sort, $direction)
                 ->paginate(20)->withQueryString(),
             'timeSeries' => $this->getDetailedTimeSeries($project, 'request', $period, $from, $to),
             'overview' => [
@@ -80,6 +84,8 @@ class RecordService
                 'max_duration' => round($overview->max_duration ?? 0, 2),
                 'min_duration' => round($overview->min_duration ?? 0, 2),
             ],
+            'sort' => $sort,
+            'direction' => $direction,
         ];
     }
 
