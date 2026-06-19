@@ -1064,7 +1064,9 @@ class RecordService
         $text = $this->jsonText($path);
 
         if ($this->isPgsql()) {
-            return "NULLIF({$text}, '')::numeric";
+            $trimmed = "NULLIF(BTRIM({$text}), '')";
+
+            return "CASE WHEN {$trimmed} ~ '^[+-]?([0-9]+([.][0-9]+)?|[.][0-9]+)$' THEN ({$trimmed})::numeric ELSE NULL END";
         }
 
         return "CAST(NULLIF({$text}, '') AS DECIMAL(20,6))";
