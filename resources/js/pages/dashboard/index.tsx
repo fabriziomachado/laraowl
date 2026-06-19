@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
+import { appendMonitoringQuery } from '@/lib/monitoring-query';
 import { formatMicroSeconds, formatCompactNumber } from '@/lib/utils';
 
 export default function Dashboard({
@@ -38,11 +39,19 @@ export default function Dashboard({
     guest_users_count,
     uptime_status,
     period,
+    from,
+    to,
 }: any) {
     const { props }: any = usePage();
     const currentProject = props.current_project || props.currentProject;
     const teamSlug = props.current_team?.slug || props.currentTeam?.slug;
     const projectSlug = currentProject?.slug;
+    const monitoringHref = (path: string) =>
+        appendMonitoringQuery(`/${teamSlug}/${projectSlug}/${path}`, {
+            period,
+            from,
+            to,
+        });
 
     useEffect(() => {
         if (!currentProject?.id || !window.Echo) {
@@ -246,7 +255,7 @@ export default function Dashboard({
                             size="sm"
                             className="h-8 gap-2 bg-muted text-[10px] font-black tracking-widest uppercase hover:bg-muted/80"
                         >
-                            <Link href={`/${teamSlug}/${projectSlug}/requests`}>
+                            <Link href={monitoringHref('requests')}>
                                 Requests <ArrowUpRight className="size-3" />
                             </Link>
                         </Button>
@@ -550,7 +559,7 @@ export default function Dashboard({
                             size="sm"
                             className="h-8 gap-2 bg-muted text-[10px] font-black tracking-widest uppercase hover:bg-muted/80"
                         >
-                            <Link href={`/${teamSlug}/${projectSlug}/jobs`}>
+                            <Link href={monitoringHref('jobs')}>
                                 Jobs <ArrowUpRight className="size-3" />
                             </Link>
                         </Button>
@@ -615,9 +624,7 @@ export default function Dashboard({
                                     variant="outline"
                                     className="ml-auto h-8 w-fit self-end border-border bg-muted px-4 text-[10px] font-black tracking-widest uppercase hover:bg-muted/50"
                                 >
-                                    <Link
-                                        href={`/${teamSlug}/${projectSlug}/exceptions`}
-                                    >
+                                    <Link href={monitoringHref('exceptions')}>
                                         View
                                     </Link>
                                 </Button>
@@ -712,7 +719,7 @@ export default function Dashboard({
                             size="sm"
                             className="h-8 gap-2 bg-muted text-[10px] font-black tracking-widest uppercase hover:bg-muted/80"
                         >
-                            <Link href={`/${teamSlug}/${projectSlug}/users`}>
+                            <Link href={monitoringHref('users')}>
                                 Users <ArrowUpRight className="size-3" />
                             </Link>
                         </Button>
@@ -749,11 +756,9 @@ export default function Dashboard({
                                                         {u.user_identifier}
                                                     </div>
                                                     <div className="truncate text-[10px] text-muted-foreground opacity-60">
-                                                        {u.user_identifier.includes(
-                                                            '@',
-                                                        )
-                                                            ? u.user_identifier
-                                                            : 'user@example.com'}
+                                                        {u.user_email ||
+                                                            (u.user_id &&
+                                                                `ID: ${u.user_id}`)}
                                                     </div>
                                                 </div>
                                             </div>
@@ -770,11 +775,7 @@ export default function Dashboard({
                                 variant="outline"
                                 className="mt-auto ml-auto h-8 w-fit border-border bg-muted px-4 text-[10px] font-black tracking-widest uppercase hover:bg-muted/50"
                             >
-                                <Link
-                                    href={`/${teamSlug}/${projectSlug}/users`}
-                                >
-                                    View
-                                </Link>
+                                <Link href={monitoringHref('users')}>View</Link>
                             </Button>
                         </Card>
 
@@ -800,11 +801,9 @@ export default function Dashboard({
                                                     {u.user_identifier}
                                                 </div>
                                                 <div className="truncate text-[10px] text-muted-foreground opacity-60">
-                                                    {u.user_identifier.includes(
-                                                        '@',
-                                                    )
-                                                        ? u.user_identifier
-                                                        : 'user@example.com'}
+                                                    {u.user_email ||
+                                                        (u.user_id &&
+                                                            `ID: ${u.user_id}`)}
                                                 </div>
                                             </div>
                                             <div className="text-xs font-black text-foreground/80">
@@ -819,11 +818,7 @@ export default function Dashboard({
                                 variant="outline"
                                 className="mt-auto ml-auto h-8 w-fit border-border bg-muted px-4 text-[10px] font-black tracking-widest uppercase hover:bg-muted/50"
                             >
-                                <Link
-                                    href={`/${teamSlug}/${projectSlug}/users`}
-                                >
-                                    View
-                                </Link>
+                                <Link href={monitoringHref('users')}>View</Link>
                             </Button>
                         </Card>
 

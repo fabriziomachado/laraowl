@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { formatCompactNumber, formatValue } from '@/lib/utils';
+import { show as showRecord } from '@/routes/records';
 
 export default function LogsIndex({ records }: { records: any }) {
     const data = records.data || [];
@@ -26,6 +27,15 @@ export default function LogsIndex({ records }: { records: any }) {
         props.current_project?.slug || props.currentProject?.slug;
 
     const [selectedLog, setSelectedLog] = useState<any>(null);
+    const recordHref = (record: number) =>
+        showRecord.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                record,
+            },
+            { mergeQuery: {} },
+        );
 
     useEffect(() => {
         if (!currentProject?.id || !window.Echo) {
@@ -190,7 +200,7 @@ export default function LogsIndex({ records }: { records: any }) {
                                 Source
                             </div>
                             <Link
-                                href={`/${teamSlug}/${projectSlug}/records/${selectedLog.id}`}
+                                href={recordHref(selectedLog.id)}
                                 className="group flex items-center justify-between rounded-lg border border-border bg-muted p-3 transition-all hover:border-border"
                             >
                                 <div className="flex items-center gap-3">

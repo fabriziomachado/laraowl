@@ -24,16 +24,24 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { monitoringQuery } from '@/lib/monitoring-query';
 import { formatMicroSeconds, formatCompactNumber } from '@/lib/utils';
+import { show as showScheduledTask } from '@/routes/scheduled-tasks';
 
 export default function ScheduledTasksIndex({
     tasks,
     timeSeries = [],
     overview,
+    period,
+    from,
+    to,
 }: {
     tasks: any;
     timeSeries: any;
     overview: any;
+    period?: string | null;
+    from?: string | null;
+    to?: string | null;
 }) {
     const { props }: any = usePage();
     const teamSlug = props.current_team?.slug || props.currentTeam?.slug;
@@ -55,9 +63,18 @@ export default function ScheduledTasksIndex({
         return () => {
             channel.stopListening('.ProjectDataIngested');
         };
-    }, []);
+    }, [currentProject?.id]);
 
     const data = tasks.data || [];
+    const scheduledTaskDetailsHref = (hash: string | number) =>
+        showScheduledTask.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                hash,
+            },
+            monitoringQuery({ period, from, to }),
+        );
 
     const formatNextRun = (dateStr: string) => {
         if (!dateStr || dateStr === 'N/A' || dateStr === 'Invalid Schedule') {
@@ -332,7 +349,9 @@ export default function ScheduledTasksIndex({
                                                                 )}
                                                             </span>
                                                             <Link
-                                                                href={`/${teamSlug}/${projectSlug}/scheduled-tasks/tasks/${task.hash}`}
+                                                                href={scheduledTaskDetailsHref(
+                                                                    task.hash,
+                                                                )}
                                                             >
                                                                 <div className="rounded border border-border bg-muted p-1 transition-all group-hover:border-border">
                                                                     <ArrowUpRight className="h-3 w-3" />

@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { formatMicroSeconds, formatCompactNumber } from '@/lib/utils';
+import { show as showRecord } from '@/routes/records';
 
 export default function QueryDetails({
     hash,
@@ -27,6 +28,15 @@ export default function QueryDetails({
         props.current_project?.slug || props.currentProject?.slug;
 
     const sql = meta?.sql || 'Unknown SQL Statement';
+    const recordHref = (record: number) =>
+        showRecord.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                record,
+            },
+            { mergeQuery: {} },
+        );
 
     return (
         <>
@@ -138,9 +148,7 @@ export default function QueryDetails({
                                             )}
                                         </TableCell>
                                         <TableCell>
-                                            <Link
-                                                href={`/${teamSlug}/${projectSlug}/records/${record.id}`}
-                                            >
+                                            <Link href={recordHref(record.id)}>
                                                 <div className="rounded border border-border bg-muted p-1 transition-all group-hover:border-border">
                                                     <ArrowUpRight className="h-3 w-3" />
                                                 </div>

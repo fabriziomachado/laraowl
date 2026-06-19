@@ -28,6 +28,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { formatCompactNumber } from '@/lib/utils';
+import { show as showSecurityThreat } from '@/routes/security';
 import { ConnectCloudflare } from './components/connect-cloudflare';
 
 const SecurityScore = ({ score }: { score: number }) => {
@@ -96,6 +97,15 @@ export default function FirewallOverview({
     const teamSlug = props.currentTeam?.slug || props.current_team?.slug;
     const projectSlug =
         props.currentProject?.slug || props.current_project?.slug;
+    const securityThreatHref = (hash: string | number) =>
+        showSecurityThreat.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                hash,
+            },
+            { mergeQuery: {} },
+        );
 
     const navItems = [
         {
@@ -567,7 +577,9 @@ export default function FirewallOverview({
                                             recentAlerts.map((alert: any) => (
                                                 <Link
                                                     key={alert.id}
-                                                    href={`/${teamSlug}/${projectSlug}/security/threats/${alert.hash}`}
+                                                    href={securityThreatHref(
+                                                        alert.hash,
+                                                    )}
                                                     className="group flex items-center justify-between p-4 transition-all hover:bg-muted/50"
                                                 >
                                                     <div className="flex flex-col gap-0.5">

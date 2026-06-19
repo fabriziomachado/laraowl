@@ -22,17 +22,25 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { monitoringQuery } from '@/lib/monitoring-query';
 import { formatMicroSeconds, formatCompactNumber } from '@/lib/utils';
+import { show as showQuery } from '@/routes/queries';
 
 export default function QueriesIndex({
     queries,
     timeSeries = [],
     overview,
+    period,
+    from,
+    to,
 }: {
     queries: any;
     timeSeries: any;
     stats: any;
     overview: any;
+    period?: string | null;
+    from?: string | null;
+    to?: string | null;
 }) {
     const { props }: any = usePage();
     const teamSlug = props.current_team?.slug || props.currentTeam?.slug;
@@ -54,9 +62,18 @@ export default function QueriesIndex({
         return () => {
             channel.stopListening('.ProjectDataIngested');
         };
-    }, []);
+    }, [currentProject?.id]);
 
     const data = queries.data || [];
+    const queryDetailsHref = (hash: string | number) =>
+        showQuery.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                hash,
+            },
+            monitoringQuery({ period, from, to }),
+        );
 
     return (
         <>
@@ -230,7 +247,9 @@ export default function QueriesIndex({
                                                         )}
                                                     </span>
                                                     <Link
-                                                        href={`/${teamSlug}/${projectSlug}/queries/statements/${q.hash}`}
+                                                        href={queryDetailsHref(
+                                                            q.hash,
+                                                        )}
                                                     >
                                                         <div className="rounded border border-border bg-muted p-1 transition-all group-hover:border-border">
                                                             <ArrowUpRight className="h-3 w-3" />

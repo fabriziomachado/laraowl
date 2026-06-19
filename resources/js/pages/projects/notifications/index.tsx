@@ -21,12 +21,20 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { monitoringQuery } from '@/lib/monitoring-query';
 import { formatCompactNumber } from '@/lib/utils';
+import { show as showNotification } from '@/routes/notifications';
 
 export default function NotificationsIndex({
     notifications,
+    period,
+    from,
+    to,
 }: {
     notifications: any;
+    period?: string | null;
+    from?: string | null;
+    to?: string | null;
 }) {
     const { props }: any = usePage();
     const teamSlug = props.current_team?.slug || props.currentTeam?.slug;
@@ -51,6 +59,15 @@ export default function NotificationsIndex({
     }, [currentProject?.id]);
 
     const data = notifications.data || [];
+    const notificationDetailsHref = (hash: string | number) =>
+        showNotification.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                hash,
+            },
+            monitoringQuery({ period, from, to }),
+        );
 
     const getChannelIcon = (channel: string) => {
         switch (channel.toLowerCase()) {
@@ -115,7 +132,9 @@ export default function NotificationsIndex({
                                         >
                                             <TableCell className="pl-6">
                                                 <Link
-                                                    href={`/${teamSlug}/${projectSlug}/notifications/channels/${notif.hash}`}
+                                                    href={notificationDetailsHref(
+                                                        notif.hash,
+                                                    )}
                                                 >
                                                     <div className="flex cursor-pointer flex-col gap-0.5">
                                                         <span className="max-w-md truncate font-mono text-xs text-foreground/90 transition-colors group-hover:text-foreground">
@@ -165,7 +184,9 @@ export default function NotificationsIndex({
                                             </TableCell>
                                             <TableCell className="pr-6">
                                                 <Link
-                                                    href={`/${teamSlug}/${projectSlug}/notifications/channels/${notif.hash}`}
+                                                    href={notificationDetailsHref(
+                                                        notif.hash,
+                                                    )}
                                                 >
                                                     <div className="cursor-pointer rounded border border-border bg-muted p-1 transition-all group-hover:border-border">
                                                         <ArrowUpRight className="h-3 w-3" />

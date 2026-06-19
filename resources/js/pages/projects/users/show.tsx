@@ -16,12 +16,19 @@ import {
     formatCompactNumber,
     formatValue,
 } from '@/lib/utils';
+import { show as showRecord } from '@/routes/records';
 
 export default function UserShow({
+    user_name,
+    user_email,
+    user_id,
     user_identifier,
     records,
     stats,
 }: {
+    user_name?: string;
+    user_email?: string;
+    user_id?: string | number;
     user_identifier: string;
     records: any;
     stats: any;
@@ -30,10 +37,20 @@ export default function UserShow({
     const teamSlug = props.current_team?.slug || props.currentTeam?.slug;
     const projectSlug =
         props.current_project?.slug || props.currentProject?.slug;
+    const displayName = user_name || user_identifier || 'Unknown User';
+    const recordHref = (record: number) =>
+        showRecord.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                record,
+            },
+            { mergeQuery: {} },
+        );
 
     return (
         <>
-            <Head title={`User - ${user_identifier}`} />
+            <Head title={`User - ${displayName}`} />
 
             <div className="space-y-8">
                 {/* Back Link */}
@@ -46,11 +63,16 @@ export default function UserShow({
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                            {user_identifier}
+                            {displayName}
                         </h1>
                         <p className="mt-1 font-mono text-xs text-muted-foreground">
-                            ID: {(user_identifier || 'Unknown').split('@')[0]}
+                            {user_email || (user_id && `ID: ${user_id}`)}
                         </p>
+                        {user_email && user_id && (
+                            <p className="mt-1 font-mono text-[10px] text-muted-foreground/70">
+                                ID: {user_id}
+                            </p>
+                        )}
                     </div>
                 </div>
 
@@ -234,9 +256,7 @@ export default function UserShow({
                                                 : 'N/A'}
                                         </TableCell>
                                         <TableCell>
-                                            <Link
-                                                href={`/${teamSlug}/${projectSlug}/records/${record.id}`}
-                                            >
+                                            <Link href={recordHref(record.id)}>
                                                 <div className="rounded border border-border bg-muted p-1 transition-all group-hover:border-border">
                                                     <ArrowUpRight className="h-3 w-3" />
                                                 </div>

@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { formatCompactNumber } from '@/lib/utils';
+import { show as showRecord } from '@/routes/records';
 
 export default function ExceptionDetails({
     hash,
@@ -32,6 +33,15 @@ export default function ExceptionDetails({
     const stack = payload.stack || [];
     const firstFrame = stack[0] || {};
     const [expandedFrames, setExpandedFrames] = useState<number[]>([]);
+    const recordHref = (record: number) =>
+        showRecord.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                record,
+            },
+            { mergeQuery: {} },
+        );
 
     const toggleFrame = (index: number) => {
         if (expandedFrames.includes(index)) {
@@ -246,9 +256,7 @@ export default function ExceptionDetails({
                                             Guest
                                         </TableCell>
                                         <TableCell>
-                                            <Link
-                                                href={`/${teamSlug}/${projectSlug}/records/${record.id}`}
-                                            >
+                                            <Link href={recordHref(record.id)}>
                                                 <div className="rounded border border-border bg-muted p-1 transition-all group-hover:border-border">
                                                     <ArrowUpRight className="h-3 w-3" />
                                                 </div>

@@ -13,8 +13,20 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { monitoringQuery } from '@/lib/monitoring-query';
+import { show as showMail } from '@/routes/mail';
 
-export default function MailIndex({ mailables }: { mailables: any }) {
+export default function MailIndex({
+    mailables,
+    period,
+    from,
+    to,
+}: {
+    mailables: any;
+    period?: string | null;
+    from?: string | null;
+    to?: string | null;
+}) {
     const { props }: any = usePage();
     const teamSlug = props.current_team?.slug || props.currentTeam?.slug;
     const currentProject = props.current_project || props.currentProject;
@@ -38,6 +50,15 @@ export default function MailIndex({ mailables }: { mailables: any }) {
     }, [currentProject?.id]);
 
     const data = mailables.data || [];
+    const mailDetailsHref = (hash: string | number) =>
+        showMail.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                hash,
+            },
+            monitoringQuery({ period, from, to }),
+        );
 
     return (
         <>
@@ -83,7 +104,9 @@ export default function MailIndex({ mailables }: { mailables: any }) {
                                         >
                                             <TableCell className="pl-6">
                                                 <Link
-                                                    href={`/${teamSlug}/${projectSlug}/mail/mailables/${mail.hash}`}
+                                                    href={mailDetailsHref(
+                                                        mail.hash,
+                                                    )}
                                                 >
                                                     <div className="flex cursor-pointer flex-col gap-0.5">
                                                         <span className="max-w-md truncate font-mono text-xs text-foreground/90 transition-colors group-hover:text-foreground">
@@ -113,7 +136,9 @@ export default function MailIndex({ mailables }: { mailables: any }) {
                                             </TableCell>
                                             <TableCell className="pr-6">
                                                 <Link
-                                                    href={`/${teamSlug}/${projectSlug}/mail/mailables/${mail.hash}`}
+                                                    href={mailDetailsHref(
+                                                        mail.hash,
+                                                    )}
                                                 >
                                                     <div className="cursor-pointer rounded border border-border bg-muted p-1 transition-all group-hover:border-border">
                                                         <ArrowUpRight className="h-3 w-3" />

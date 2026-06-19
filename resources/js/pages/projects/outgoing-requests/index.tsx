@@ -22,16 +22,24 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { monitoringQuery } from '@/lib/monitoring-query';
 import { formatMicroSeconds, formatCompactNumber } from '@/lib/utils';
+import { show as showOutgoingRequest } from '@/routes/outgoing-requests';
 
 export default function OutgoingRequestsIndex({
     hosts,
     timeSeries = [],
     overview,
+    period,
+    from,
+    to,
 }: {
     hosts: any;
     timeSeries: any;
     overview: any;
+    period?: string | null;
+    from?: string | null;
+    to?: string | null;
 }) {
     const { props }: any = usePage();
     const teamSlug = props.current_team?.slug || props.currentTeam?.slug;
@@ -53,9 +61,18 @@ export default function OutgoingRequestsIndex({
         return () => {
             channel.stopListening('.ProjectDataIngested');
         };
-    }, []);
+    }, [currentProject?.id]);
 
     const data = hosts.data || [];
+    const outgoingRequestDetailsHref = (hash: string | number) =>
+        showOutgoingRequest.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                hash,
+            },
+            monitoringQuery({ period, from, to }),
+        );
 
     return (
         <>
@@ -300,7 +317,9 @@ export default function OutgoingRequestsIndex({
                                             >
                                                 <TableCell className="pl-6">
                                                     <Link
-                                                        href={`/${teamSlug}/${projectSlug}/outgoing-requests/destinations/${h.hash}`}
+                                                        href={outgoingRequestDetailsHref(
+                                                            h.hash,
+                                                        )}
                                                     >
                                                         <div className="flex cursor-pointer items-center gap-2 transition-opacity hover:opacity-80">
                                                             <Globe className="h-3 w-3 text-muted-foreground/50" />
@@ -345,7 +364,9 @@ export default function OutgoingRequestsIndex({
                                                             )}
                                                         </span>
                                                         <Link
-                                                            href={`/${teamSlug}/${projectSlug}/outgoing-requests/destinations/${h.hash}`}
+                                                            href={outgoingRequestDetailsHref(
+                                                                h.hash,
+                                                            )}
                                                         >
                                                             <div className="cursor-pointer rounded border border-border bg-muted p-1 transition-all group-hover:border-border">
                                                                 <ArrowUpRight className="h-3 w-3" />

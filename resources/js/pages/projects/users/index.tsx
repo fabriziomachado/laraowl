@@ -14,17 +14,23 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { monitoringQuery } from '@/lib/monitoring-query';
 import { formatCompactNumber } from '@/lib/utils';
+import { show as showUser } from '@/routes/users';
 
 export default function UsersIndex({
     users,
     timeSeries = [],
     period,
+    from,
+    to,
     overview,
 }: {
     users: any;
     timeSeries: any;
     period: string;
+    from?: string | null;
+    to?: string | null;
     overview: any;
 }) {
     const periodLabel = period?.toUpperCase() || '24H';
@@ -48,9 +54,20 @@ export default function UsersIndex({
         return () => {
             channel.stopListening('.ProjectDataIngested');
         };
-    }, []);
+    }, [currentProject?.id]);
 
     const data = users.data || [];
+    const userDetailsHref = (hash: string | number) =>
+        showUser.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                hash,
+            },
+            {
+                ...monitoringQuery({ period, from, to }),
+            },
+        );
 
     return (
         <>
@@ -304,7 +321,9 @@ export default function UsersIndex({
                                             >
                                                 <TableCell className="pl-6">
                                                     <Link
-                                                        href={`/${teamSlug}/${projectSlug}/users/identifiers/${u.hash}`}
+                                                        href={userDetailsHref(
+                                                            u.hash,
+                                                        )}
                                                     >
                                                         <div className="flex cursor-pointer items-center gap-3">
                                                             <div className="flex flex-col">
@@ -367,7 +386,9 @@ export default function UsersIndex({
                                                 </TableCell>
                                                 <TableCell className="pr-6">
                                                     <Link
-                                                        href={`/${teamSlug}/${projectSlug}/users/identifiers/${u.hash}`}
+                                                        href={userDetailsHref(
+                                                            u.hash,
+                                                        )}
                                                     >
                                                         <div className="cursor-pointer rounded border border-border bg-muted p-1 text-muted-foreground transition-all group-hover:border-border group-hover:text-foreground">
                                                             <ArrowUpRight className="h-3 w-3" />

@@ -22,16 +22,24 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { monitoringQuery } from '@/lib/monitoring-query';
 import { formatMicroSeconds, formatCompactNumber } from '@/lib/utils';
+import { show as showCommand } from '@/routes/commands';
 
 export default function CommandsIndex({
     commands,
     timeSeries = [],
     overview,
+    period,
+    from,
+    to,
 }: {
     commands: any;
     timeSeries: any;
     overview: any;
+    period?: string | null;
+    from?: string | null;
+    to?: string | null;
 }) {
     const { props }: any = usePage();
     const teamSlug = props.current_team?.slug || props.currentTeam?.slug;
@@ -53,9 +61,18 @@ export default function CommandsIndex({
         return () => {
             channel.stopListening('.ProjectDataIngested');
         };
-    }, []);
+    }, [currentProject?.id]);
 
     const data = commands.data || [];
+    const commandDetailsHref = (hash: string | number) =>
+        showCommand.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                hash,
+            },
+            monitoringQuery({ period, from, to }),
+        );
 
     return (
         <>
@@ -289,7 +306,9 @@ export default function CommandsIndex({
                                             >
                                                 <TableCell className="pl-6">
                                                     <Link
-                                                        href={`/${teamSlug}/${projectSlug}/commands/types/${cmd.hash}`}
+                                                        href={commandDetailsHref(
+                                                            cmd.hash,
+                                                        )}
                                                     >
                                                         <div className="flex cursor-pointer items-center gap-2 transition-opacity hover:opacity-80">
                                                             <Terminal className="h-3 w-3 text-muted-foreground/50" />
@@ -336,7 +355,9 @@ export default function CommandsIndex({
                                                             )}
                                                         </span>
                                                         <Link
-                                                            href={`/${teamSlug}/${projectSlug}/commands/types/${cmd.hash}`}
+                                                            href={commandDetailsHref(
+                                                                cmd.hash,
+                                                            )}
                                                         >
                                                             <div className="cursor-pointer rounded border border-border bg-muted p-1 transition-all group-hover:border-border">
                                                                 <ArrowUpRight className="h-3 w-3" />

@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { formatMicroSeconds, formatCompactNumber } from '@/lib/utils';
+import { show as showRecord } from '@/routes/records';
 
 export default function RequestDetails({
     hash,
@@ -28,6 +29,15 @@ export default function RequestDetails({
 
     const path = meta?.path || '/';
     const method = meta?.method || 'GET';
+    const recordHref = (record: number) =>
+        showRecord.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                record,
+            },
+            { mergeQuery: {} },
+        );
 
     const getStatusColor = (status: number) => {
         if (status >= 500) {
@@ -140,9 +150,7 @@ export default function RequestDetails({
                                             )}
                                         </TableCell>
                                         <TableCell>
-                                            <Link
-                                                href={`/${teamSlug}/${projectSlug}/records/${record.id}`}
-                                            >
+                                            <Link href={recordHref(record.id)}>
                                                 <div className="rounded border border-border bg-muted p-1 transition-all group-hover:border-border">
                                                     <ArrowUpRight className="h-3 w-3" />
                                                 </div>

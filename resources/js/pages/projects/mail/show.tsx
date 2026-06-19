@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { formatValue } from '@/lib/utils';
+import { show as showRecord } from '@/routes/records';
 
 export default function MailShow({
     hash,
@@ -32,6 +33,15 @@ export default function MailShow({
         meta?.mailable ||
         meta?.name ||
         'Unknown Mailable';
+    const recordHref = (record: number) =>
+        showRecord.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                record,
+            },
+            { mergeQuery: {} },
+        );
 
     return (
         <>
@@ -109,9 +119,7 @@ export default function MailShow({
                                         )}
                                     </TableCell>
                                     <TableCell>
-                                        <Link
-                                            href={`/${teamSlug}/${projectSlug}/records/${record.id}`}
-                                        >
+                                        <Link href={recordHref(record.id)}>
                                             <div className="rounded border border-border bg-muted p-1 transition-all group-hover:border-border">
                                                 <ArrowUpRight className="h-3 w-3" />
                                             </div>

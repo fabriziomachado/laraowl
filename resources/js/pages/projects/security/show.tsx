@@ -17,6 +17,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { show as showRecord } from '@/routes/records';
 
 export default function SecurityDetails({
     hash,
@@ -34,6 +35,15 @@ export default function SecurityDetails({
 
     const title = meta?.title || 'Security Threat';
     const message = meta?.message || 'No details available';
+    const recordHref = (record: number) =>
+        showRecord.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                record,
+            },
+            { mergeQuery: {} },
+        );
 
     return (
         <>
@@ -332,9 +342,7 @@ export default function SecurityDetails({
                                             </div>
                                         </TableCell>
                                         <TableCell className="px-6 py-5 align-top">
-                                            <Link
-                                                href={`/${teamSlug}/${projectSlug}/records/${record.id}`}
-                                            >
+                                            <Link href={recordHref(record.id)}>
                                                 <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-muted transition-all group-hover:border-primary/50 group-hover:bg-primary/5">
                                                     <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
                                                 </div>

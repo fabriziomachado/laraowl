@@ -10,6 +10,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { show as showRecord } from '@/routes/records';
 
 export default function NotificationShow({
     hash,
@@ -28,6 +29,15 @@ export default function NotificationShow({
     const notificationClass =
         meta?.notification_class || 'Unknown Notification';
     const channel = meta?.channel || 'UNKNOWN';
+    const recordHref = (record: number) =>
+        showRecord.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                record,
+            },
+            { mergeQuery: {} },
+        );
 
     return (
         <>
@@ -97,9 +107,7 @@ export default function NotificationShow({
                                             : 'Generic'}
                                     </TableCell>
                                     <TableCell>
-                                        <Link
-                                            href={`/${teamSlug}/${projectSlug}/records/${record.id}`}
-                                        >
+                                        <Link href={recordHref(record.id)}>
                                             <div className="rounded border border-border bg-muted p-1 transition-all group-hover:border-border">
                                                 <ArrowUpRight className="h-3 w-3" />
                                             </div>

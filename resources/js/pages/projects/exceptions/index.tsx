@@ -15,17 +15,25 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { monitoringQuery } from '@/lib/monitoring-query';
 import { formatCompactNumber } from '@/lib/utils';
+import { show as showException } from '@/routes/exceptions';
 
 export default function ExceptionsIndex({
     exceptions,
     timeSeries = [],
     overview,
+    period,
+    from,
+    to,
 }: {
     exceptions: any;
     timeSeries: any;
     stats: any;
     overview: any;
+    period?: string | null;
+    from?: string | null;
+    to?: string | null;
 }) {
     const { props }: any = usePage();
     const teamSlug = props.current_team?.slug || props.currentTeam?.slug;
@@ -47,9 +55,18 @@ export default function ExceptionsIndex({
         return () => {
             channel.stopListening('.ProjectDataIngested');
         };
-    }, []);
+    }, [currentProject?.id]);
 
     const data = exceptions.data || [];
+    const exceptionDetailsHref = (hash: string | number) =>
+        showException.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                hash,
+            },
+            monitoringQuery({ period, from, to }),
+        );
 
     return (
         <>
@@ -163,7 +180,9 @@ export default function ExceptionsIndex({
                                                 </TableCell>
                                                 <TableCell>
                                                     <Link
-                                                        href={`/${teamSlug}/${projectSlug}/exceptions/types/${exc.hash}`}
+                                                        href={exceptionDetailsHref(
+                                                            exc.hash,
+                                                        )}
                                                     >
                                                         <div className="flex cursor-pointer flex-col gap-1">
                                                             <div className="flex items-center gap-2">
@@ -194,7 +213,9 @@ export default function ExceptionsIndex({
                                                             )}
                                                         </span>
                                                         <Link
-                                                            href={`/${teamSlug}/${projectSlug}/exceptions/types/${exc.hash}`}
+                                                            href={exceptionDetailsHref(
+                                                                exc.hash,
+                                                            )}
                                                         >
                                                             <div className="rounded border border-border bg-muted p-1 transition-all group-hover:border-border">
                                                                 <ArrowUpRight className="h-3 w-3 text-muted-foreground group-hover:text-foreground" />

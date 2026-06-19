@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { formatMicroSeconds, formatCompactNumber } from '@/lib/utils';
+import { show as showRecord } from '@/routes/records';
 
 export default function CommandShow({
     hash,
@@ -27,6 +28,15 @@ export default function CommandShow({
         props.current_project?.slug || props.currentProject?.slug;
 
     const commandName = meta?.command || 'Unknown Command';
+    const recordHref = (record: number) =>
+        showRecord.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                record,
+            },
+            { mergeQuery: {} },
+        );
 
     return (
         <>
@@ -128,9 +138,7 @@ export default function CommandShow({
                                             )}
                                         </TableCell>
                                         <TableCell>
-                                            <Link
-                                                href={`/${teamSlug}/${projectSlug}/records/${record.id}`}
-                                            >
+                                            <Link href={recordHref(record.id)}>
                                                 <div className="rounded border border-border bg-muted p-1 transition-all group-hover:border-border">
                                                     <ArrowUpRight className="h-3 w-3" />
                                                 </div>

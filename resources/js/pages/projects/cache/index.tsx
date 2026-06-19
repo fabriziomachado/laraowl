@@ -42,7 +42,7 @@ export default function CacheIndex({
         return () => {
             channel.stopListening('.ProjectDataIngested');
         };
-    }, []);
+    }, [currentProject?.id]);
 
     const data = keys.data || [];
     const totalWrites = data.reduce(

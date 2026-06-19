@@ -32,7 +32,7 @@ export default function UptimeIndex({ checks, uptime_stats, period }: any) {
         return () => {
             channel.stopListening('.ProjectDataIngested');
         };
-    }, []);
+    }, [currentProject?.id]);
 
     return (
         <>

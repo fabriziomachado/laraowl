@@ -31,6 +31,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { appendMonitoringQuery } from '@/lib/monitoring-query';
 import { formatCompactNumber } from '@/lib/utils';
 
 export function IssueTable({
@@ -46,8 +47,16 @@ export function IssueTable({
     const teamSlug = props.currentTeam?.slug || props.current_team?.slug;
     const projectSlug =
         props.currentProject?.slug || props.current_project?.slug;
+    const period = props.period as string | null | undefined;
+    const from = props.from as string | null | undefined;
+    const to = props.to as string | null | undefined;
 
     const data = issues.data || [];
+    const issueHref = (issue: any) =>
+        appendMonitoringQuery(
+            `/${teamSlug}/${projectSlug}/${baseUrl}/${baseUrl === 'issues' ? issue.id : issue.hash || issue.id}`,
+            { period, from, to },
+        );
 
     const updateIssue = (id: number, data: any) => {
         router.patch(`/${teamSlug}/${projectSlug}/${baseUrl}/${id}`, data, {
@@ -164,7 +173,7 @@ export function IssueTable({
                             </TableCell>
                             <TableCell>
                                 <Link
-                                    href={`/${teamSlug}/${projectSlug}/${baseUrl}/${baseUrl === 'issues' ? issue.id : issue.hash || issue.id}`}
+                                    href={issueHref(issue)}
                                     className="flex w-[150px] flex-col sm:w-[250px] md:w-[350px] lg:w-[350px]"
                                 >
                                     <TooltipProvider delayDuration={100}>

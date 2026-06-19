@@ -22,16 +22,24 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { monitoringQuery } from '@/lib/monitoring-query';
 import { formatMicroSeconds, formatCompactNumber } from '@/lib/utils';
+import { show as showJob } from '@/routes/jobs';
 
 export default function JobsIndex({
     jobs,
     timeSeries = [],
     overview,
+    period,
+    from,
+    to,
 }: {
     jobs: any;
     timeSeries: any;
     overview: any;
+    period?: string | null;
+    from?: string | null;
+    to?: string | null;
 }) {
     const { props }: any = usePage();
     const teamSlug = props.current_team?.slug || props.currentTeam?.slug;
@@ -53,9 +61,18 @@ export default function JobsIndex({
         return () => {
             channel.stopListening('.ProjectDataIngested');
         };
-    }, []);
+    }, [currentProject?.id]);
 
     const data = jobs.data || [];
+    const jobDetailsHref = (hash: string | number) =>
+        showJob.url(
+            {
+                current_team: teamSlug,
+                project: projectSlug,
+                hash,
+            },
+            monitoringQuery({ period, from, to }),
+        );
 
     return (
         <>
@@ -304,7 +321,9 @@ export default function JobsIndex({
                                             >
                                                 <TableCell className="pl-6">
                                                     <Link
-                                                        href={`/${teamSlug}/${projectSlug}/jobs/types/${job.hash}`}
+                                                        href={jobDetailsHref(
+                                                            job.hash,
+                                                        )}
                                                     >
                                                         <div className="flex cursor-pointer items-center gap-2">
                                                             <Zap className="h-3 w-3 text-muted-foreground/50" />
@@ -349,7 +368,9 @@ export default function JobsIndex({
                                                 </TableCell>
                                                 <TableCell className="pr-6">
                                                     <Link
-                                                        href={`/${teamSlug}/${projectSlug}/jobs/types/${job.hash}`}
+                                                        href={jobDetailsHref(
+                                                            job.hash,
+                                                        )}
                                                     >
                                                         <div className="cursor-pointer rounded border border-border bg-muted p-1 transition-all group-hover:border-border">
                                                             <ArrowUpRight className="h-3 w-3" />
